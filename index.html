@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Room with Three.js</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7.5);
+        scene.add(directionalLight);
+
+        // Room dimensions (e.g., 1000 sqft area room with aspect ratio 4:5:8)
+        const roomWidth = 20;  // assuming 20 units width
+        const roomHeight = 12.5;  // assuming 12.5 units height
+        const roomDepth = 40;  // assuming 40 units depth
+
+        // Room walls (simple box geometry)
+        const roomGeometry = new THREE.BoxGeometry(roomWidth, roomHeight, roomDepth);
+        const roomMaterial = new THREE.MeshBasicMaterial({ color: 0xa0a0a0, wireframe: true });
+        const room = new THREE.Mesh(roomGeometry, roomMaterial);
+        room.position.set(0, roomHeight / 2, 0);  // position room on ground level
+        scene.add(room);
+
+        // Function to create a box (representing furniture)
+        function createBox(width, height, depth, color, x, y, z) {
+            const geometry = new THREE.BoxGeometry(width, height, depth);
+            const material = new THREE.MeshStandardMaterial({ color: color });
+            const box = new THREE.Mesh(geometry, material);
+            box.position.set(x, y, z);
+            return box;
+        }
+
+        // Add furniture
+        const table = createBox(3, 1, 2, 0x8B4513, 0, 0.5, 0);  // table in the center
+        const chair1 = createBox(1, 1.5, 1, 0x0000ff, -2, 0.75, 2);  // chair 1
+        const chair2 = createBox(1, 1.5, 1, 0x0000ff, 2, 0.75, 2);  // chair 2
+        const sofa = createBox(4, 1.5, 2, 0xff0000, -5, 0.75, -5);  // sofa
+        const lamp = createBox(0.5, 3, 0.5, 0xffff00, 5, 1.5, 5);  // lamp
+
+        // Add furniture to the scene
+        scene.add(table);
+        scene.add(chair1);
+        scene.add(chair2);
+        scene.add(sofa);
+        scene.add(lamp);
+
+        // Camera positioning
+        camera.position.set(20, 20, 50);
+        camera.lookAt(0, 0, 0);
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
